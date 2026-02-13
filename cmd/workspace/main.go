@@ -16,7 +16,7 @@ import (
 func main() {
 	terminals := flag.IntP("terminals", "t", 2, "number of Ghostty terminal windows to open")
 	colorName := flag.StringP("color", "c", "", "force a specific color scheme (e.g. red, blue, green)")
-	browser := flag.BoolP("browser", "b", false, "also launch a Firefox profile (not yet implemented)")
+	browser := flag.BoolP("browser", "b", false, "also launch a color-themed Firefox profile")
 	list := flag.BoolP("list", "l", false, "list all current color assignments")
 	resetColor := flag.Bool("reset-color", false, "remove the color assignment for a project")
 	noCursor := flag.Bool("no-cursor", false, "skip opening Cursor IDE")
@@ -69,8 +69,17 @@ func main() {
 	fmt.Printf("Color:     %s (%s)\n", scheme.Name, scheme.Base)
 	fmt.Println()
 
+	// Launch Firefox with themed profile.
 	if *browser {
-		fmt.Println("(Firefox integration not yet implemented — coming soon)")
+		fmt.Println("Setting up Firefox profile...")
+		if err := launcher.EnsureFirefoxProfile(scheme); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: Firefox profile setup failed: %v\n", err)
+		} else {
+			fmt.Println("Launching Firefox...")
+			if err := launcher.LaunchFirefox(scheme); err != nil {
+				fmt.Fprintf(os.Stderr, "warning: Firefox launch failed: %v\n", err)
+			}
+		}
 	}
 
 	// Launch Ghostty terminals.
@@ -127,6 +136,7 @@ Examples:
   workspace ~/projects/zenml                    # 2 terminals + Cursor
   workspace ~/projects/zenml --terminals 4      # 4 terminals + Cursor
   workspace ~/projects/zenml -c red             # force red color
+  workspace ~/projects/zenml --browser           # include Firefox
   workspace ~/projects/zenml --no-cursor        # terminals only
   workspace --list                              # show all assignments
   workspace ~/projects/zenml --reset-color      # unassign color
