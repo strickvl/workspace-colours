@@ -26,7 +26,16 @@ When you run `workspace <project-dir>`:
 4. **Launches Firefox** *(optional)* — opens a Firefox profile themed to match
 5. **Updates window borders** *(optional)* — sets JankyBorders to the workspace colour
 
-The colour assignment is persistent — the next time you open the same project, it gets the same colour.
+The colour assignment is persistent — the next time you open the same project, it gets the same colour. All launched windows are tracked, so you can close an entire workspace with one command:
+
+```
+$ workspace close ~/projects/zenml
+
+Closing workspace: zenml (red)
+  Closing Ghostty — Main (PID 12345)...
+  Closing Ghostty — Server (PID 12346)...
+  Closing Cursor IDE (PID 12347)...
+```
 
 ## Supported tools
 
@@ -96,6 +105,12 @@ workspace ~/projects/zenml --borders
 # The full experience
 workspace ~/projects/zenml -t 3 --browser --borders
 
+# Close all windows for a workspace
+workspace close ~/projects/zenml
+
+# Close ALL tracked workspaces
+workspace --close-all
+
 # Reset a project's colour
 workspace ~/projects/zenml --reset-color
 ```
@@ -140,6 +155,12 @@ Colour assignments are stored in:
 
 ```
 ~/.config/workspace-colours/assignments.json
+```
+
+Session tracking files (for `workspace close`) are stored in:
+
+```
+~/.config/workspace-colours/sessions/
 ```
 
 Ghostty theme files are stored in:

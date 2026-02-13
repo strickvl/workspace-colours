@@ -158,7 +158,28 @@ workspace ~/projects/some-project --color green
 
 This overrides the automatic assignment. The project will be green from now on.
 
-### Step 5: Reset and reassign
+### Step 5: Close a workspace
+
+All launched windows are tracked by PID. To close everything for a project:
+
+```bash
+workspace close ~/projects/some-project
+```
+
+**What happens:**
+1. Reads the session file from `~/.config/workspace-colours/sessions/`
+2. For each tracked PID, verifies it's still alive AND still the expected process (prevents killing unrelated processes that reused the PID)
+3. Sends SIGTERM to each verified process
+4. Deletes the session file
+
+**Verify:** The Ghostty terminals, Cursor window, and Firefox window for that project should all close.
+
+To close ALL tracked workspaces at once:
+```bash
+workspace --close-all
+```
+
+### Step 6: Reset and reassign
 
 ```bash
 workspace ~/projects/some-project --reset-color
@@ -178,6 +199,7 @@ The tool creates/uses these files:
 | `<project>/.vscode/settings.json` | Cursor colour customizations (merged into existing settings) |
 | `~/Library/Application Support/Firefox/Profiles/*.<name>/chrome/userChrome.css` | Firefox UI theming (one per colour profile) |
 | `~/Library/Application Support/Firefox/Profiles/*.<name>/user.js` | Firefox pref to enable userChrome.css |
+| `~/.config/workspace-colours/sessions/*.json` | Session tracking (PIDs of launched windows, for `workspace close`) |
 
 ## Troubleshooting
 
@@ -200,6 +222,12 @@ Check `<project>/.vscode/settings.json` — it should contain a `workbench.color
 1. Ensure borders is running: `pgrep borders`
 2. If not, start it: `brew services start borders`
 3. Try running borders directly: `borders active_color=0xffcc3333 width=6.0 style=round`
+
+### `workspace close` says "already closed" for everything
+This means the user manually closed the windows. The session file is stale. Run `workspace close <dir>` anyway — it will clean up the session file. Or delete session files manually:
+```bash
+rm ~/.config/workspace-colours/sessions/*.json
+```
 
 ### Colour assignments are wrong
 View the assignments file directly:
@@ -228,13 +256,17 @@ rm ~/.config/workspace-colours/assignments.json
 ## Architecture (for development)
 
 ```
-cmd/workspace/main.go          — CLI entry point, flag parsing, orchestration
-internal/color/scheme.go       — Colour scheme definitions and lookup
-internal/config/config.go      — Assignment persistence (JSON read/write)
-internal/launcher/ghostty.go   — Ghostty theme files and window launching
-internal/launcher/cursor.go    — Cursor .vscode/settings.json and launching
-internal/launcher/firefox.go   — Firefox profile creation and theming
-internal/launcher/borders.go   — JankyBorders runtime colour updates
+cmd/workspace/main.go              — CLI entry point, flag parsing, orchestration
+internal/color/scheme.go           — Colour scheme definitions and lookup
+internal/config/config.go          — Assignment persistence (JSON read/write)
+internal/config/session.go         — Session tracking (launched PIDs, close logic)
+internal/config/process_darwin.go  — macOS process verification (ps-based)
+internal/config/process_linux.go   — Linux process verification (/proc-based)
+internal/launcher/launched.go      — LaunchedProcess type (shared by all launchers)
+internal/launcher/ghostty.go       — Ghostty theme files and window launching
+internal/launcher/cursor.go        — Cursor .vscode/settings.json and launching
+internal/launcher/firefox.go       — Firefox profile creation and theming
+internal/launcher/borders.go       — JankyBorders runtime colour updates
 ```
 
 Single dependency: `github.com/spf13/pflag` (GNU-style flag parsing).
