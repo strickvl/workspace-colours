@@ -1,5 +1,7 @@
 # workspace-colours
 
+<video src="https://github.com/user-attachments/assets/367ec9f4-794d-48a0-99db-1fd1edd9b09a" width="100%" autoplay loop muted playsinline></video>
+
 **One command to launch a color-coded workspace.** Every tool — terminal, IDE, browser — gets the same colour, so you always know which project you're looking at.
 
 Context switching between projects is cognitively expensive when every terminal and editor window looks identical. `workspace-colours` fixes this by assigning a persistent colour to each project directory and applying it across your entire toolchain.
