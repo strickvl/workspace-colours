@@ -21,6 +21,7 @@ func main() {
 	resetColor := flag.Bool("reset-color", false, "remove the color assignment for a project")
 	noCursor := flag.Bool("no-cursor", false, "skip opening Cursor IDE")
 	noTerminals := flag.Bool("no-terminals", false, "skip opening Ghostty terminals")
+	borders := flag.Bool("borders", false, "update JankyBorders active window colour")
 	flag.Usage = usage
 
 	flag.Parse()
@@ -99,6 +100,14 @@ func main() {
 		fmt.Println("Opening Cursor...")
 		if err := launcher.LaunchCursor(absDir); err != nil {
 			fmt.Fprintf(os.Stderr, "warning: Cursor launch failed: %v\n", err)
+		}
+	}
+
+	// Update JankyBorders window border colour.
+	if *borders {
+		fmt.Println("Updating JankyBorders...")
+		if err := launcher.UpdateBorders(scheme); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: JankyBorders update failed: %v\n", err)
 		}
 	}
 
