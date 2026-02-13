@@ -1,6 +1,6 @@
 # workspace-colours
 
-<video src="https://github.com/user-attachments/assets/367ec9f4-794d-48a0-99db-1fd1edd9b09a" width="100%" controls></video>
+<video src="https://github.com/user-attachments/assets/abfe485c-073a-475a-872f-18b44b98a5a3" width="100%" controls></video>
 
 **One command to launch a color-coded workspace.** Every tool — terminal, IDE, browser — gets the same colour, so you always know which project you're looking at.
 
@@ -60,6 +60,8 @@ Closing workspace: zenml (red)
 - **[JankyBorders](https://github.com/FelixKratz/JankyBorders)** — for OS-level window border colours (activated with `--borders`). Install: `brew tap FelixKratz/formulae && brew install borders`
 
 ## Installation
+
+**Using Claude Code?** Just point it at [`CLAUDE_SETUP_GUIDE.md`](CLAUDE_SETUP_GUIDE.md) — it has step-by-step instructions for checking prerequisites, building, and verifying the install.
 
 ```bash
 go install github.com/strickvl/workspace-colours/cmd/workspace@latest
