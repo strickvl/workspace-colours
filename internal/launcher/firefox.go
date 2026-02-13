@@ -255,10 +255,11 @@ func EnsureFirefoxProfile(scheme *color.Scheme) error {
 }
 
 // LaunchFirefox opens Firefox with the workspace-themed profile.
-func LaunchFirefox(scheme *color.Scheme) error {
+// Returns info about the launched process for session tracking.
+func LaunchFirefox(scheme *color.Scheme) (*LaunchedProcess, error) {
 	bin, _, err := findFirefox()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	name := profileName(scheme)
@@ -266,7 +267,11 @@ func LaunchFirefox(scheme *color.Scheme) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("launching Firefox with profile %q: %w", name, err)
+		return nil, fmt.Errorf("launching Firefox with profile %q: %w", name, err)
 	}
-	return nil
+	return &LaunchedProcess{
+		PID:         cmd.Process.Pid,
+		CommandName: "firefox",
+		Description: fmt.Sprintf("Firefox — %s", name),
+	}, nil
 }

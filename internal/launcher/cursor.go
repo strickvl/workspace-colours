@@ -56,19 +56,24 @@ func ConfigureCursor(scheme *color.Scheme, projectDir string) error {
 }
 
 // LaunchCursor opens the project directory in Cursor.
-func LaunchCursor(projectDir string) error {
+// Returns info about the launched process for session tracking.
+func LaunchCursor(projectDir string) (*LaunchedProcess, error) {
 	cursorBin, err := findCursor()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cmd := exec.Command(cursorBin, projectDir)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("launching Cursor: %w", err)
+		return nil, fmt.Errorf("launching Cursor: %w", err)
 	}
-	return nil
+	return &LaunchedProcess{
+		PID:         cmd.Process.Pid,
+		CommandName: "cursor",
+		Description: "Cursor IDE",
+	}, nil
 }
 
 // findCursor locates the Cursor CLI binary.

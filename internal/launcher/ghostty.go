@@ -48,19 +48,21 @@ selection-foreground = ffffff
 
 // LaunchGhostty opens N Ghostty terminal windows with the given color scheme.
 // Each window gets a title derived from the project name and an index.
-func LaunchGhostty(scheme *color.Scheme, projectDir string, count int) error {
+// Returns info about each launched process for session tracking.
+func LaunchGhostty(scheme *color.Scheme, projectDir string, count int) ([]LaunchedProcess, error) {
 	if err := EnsureGhosttyTheme(scheme); err != nil {
-		return err
+		return nil, err
 	}
 
 	ghosttyBin, err := findGhostty()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	projectName := filepath.Base(projectDir)
 	themeName := themeFileName(scheme)
 
+	var launched []LaunchedProcess
 	labels := defaultTerminalLabels(count)
 	for i := range count {
 		title := fmt.Sprintf("%s — %s", projectName, labels[i])
@@ -74,11 +76,15 @@ func LaunchGhostty(scheme *color.Scheme, projectDir string, count int) error {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		if err := cmd.Start(); err != nil {
-			return fmt.Errorf("launching Ghostty window %d: %w", i+1, err)
+			return launched, fmt.Errorf("launching Ghostty window %d: %w", i+1, err)
 		}
-		// Don't wait — these are background GUI processes.
+		launched = append(launched, LaunchedProcess{
+			PID:         cmd.Process.Pid,
+			CommandName: "ghostty",
+			Description: fmt.Sprintf("Ghostty — %s", labels[i]),
+		})
 	}
-	return nil
+	return launched, nil
 }
 
 // findGhostty locates the Ghostty binary.
