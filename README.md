@@ -23,8 +23,8 @@ When you run `workspace <project-dir>`:
 1. **Assigns a colour** — picks the next unused colour from a palette of 8 schemes, or uses the one already assigned to that project
 2. **Opens Ghostty terminals** — launches N terminal windows with a subtle background tint matching the colour
 3. **Configures Cursor** — writes `.vscode/settings.json` colour customizations (title bar, activity bar, status bar) and opens the project
-4. **Launches Firefox** *(coming soon)* — opens a Firefox profile themed to match
-5. **Updates window borders** *(coming soon)* — sets JankyBorders to the workspace colour
+4. **Launches Firefox** *(optional)* — opens a Firefox profile themed to match
+5. **Updates window borders** *(optional)* — sets JankyBorders to the workspace colour
 
 The colour assignment is persistent — the next time you open the same project, it gets the same colour.
 
@@ -34,8 +34,8 @@ The colour assignment is persistent — the next time you open the same project,
 |------|--------|-------------|
 | [Ghostty](https://ghostty.org) (terminal) | Supported | Custom theme files, launched via CLI flags |
 | [Cursor](https://cursor.sh) (IDE) | Supported | Per-workspace `.vscode/settings.json` colour overrides |
-| Firefox (browser) | Planned | Separate profiles with themed `userChrome.css` |
-| [JankyBorders](https://github.com/FelixKratz/JankyBorders) (window borders) | Planned | Runtime-updatable border colour |
+| [Firefox](https://www.mozilla.org/firefox/) (browser) | Supported | Separate profiles with themed `userChrome.css` |
+| [JankyBorders](https://github.com/FelixKratz/JankyBorders) (window borders) | Supported | Runtime-updatable border colour |
 
 ## Prerequisites
 
@@ -43,6 +43,10 @@ The colour assignment is persistent — the next time you open the same project,
 - **[Ghostty](https://ghostty.org)** terminal emulator
 - **[Cursor](https://cursor.sh)** IDE with the CLI installed (`Cursor → Command Palette → "Install 'cursor' command in PATH"`)
 - **Go 1.22+** (for installation)
+
+**Optional:**
+- **[Firefox](https://www.mozilla.org/firefox/)** or **Firefox Developer Edition** — for browser colour theming (activated with `--browser`)
+- **[JankyBorders](https://github.com/FelixKratz/JankyBorders)** — for OS-level window border colours (activated with `--borders`). Install: `brew tap FelixKratz/formulae && brew install borders`
 
 ## Installation
 
@@ -82,6 +86,15 @@ workspace ~/projects/zenml --no-terminals
 
 # List all colour assignments
 workspace --list
+
+# Include a themed Firefox window
+workspace ~/projects/zenml --browser
+
+# Update JankyBorders window border colour
+workspace ~/projects/zenml --borders
+
+# The full experience
+workspace ~/projects/zenml -t 3 --browser --borders
 
 # Reset a project's colour
 workspace ~/projects/zenml --reset-color
@@ -135,12 +148,18 @@ Ghostty theme files are stored in:
 ~/.config/ghostty/themes/workspace-*
 ```
 
+### Firefox
+
+When `--browser` is used, a dedicated Firefox profile named `workspace-<colour>` is created (if it doesn't already exist). The profile gets a `userChrome.css` that themes the toolbar, tab bar, and navigation bar, plus a `user.js` that enables the custom stylesheet. Firefox Developer Edition is preferred when available.
+
+### JankyBorders
+
+When `--borders` is used, the JankyBorders active window border colour is updated at runtime to match the workspace. This is a global setting (it can't colour individual windows differently), but it reinforces "what am I working on right now."
+
 ## Contributing
 
 Contributions are welcome! Some areas that could use help:
 
-- **Firefox integration** — per-profile theming via `userChrome.css`
-- **JankyBorders integration** — runtime border colour updates
 - **Linux support** — different application paths and config locations
 - **Additional colour schemes** — the palette is easy to extend
 
